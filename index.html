@@ -1,122 +1,112 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازی تحت وب</title>
+    <title>Hacker Game</title>
     <style>
         body {
+            font-family: 'Arial', sans-serif;
+            background-color: #0c0c0c;
+            color: #00ff00;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: white;
             text-align: center;
         }
-        .game-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
+        .container {
+            padding: 50px;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
         }
         .game-button {
-            margin: 10px;
-            padding: 20px;
-            font-size: 20px;
-            background-color: #333;
+            background-color: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            font-size: 1.5rem;
             border: none;
-            color: white;
-            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            border-radius: 5px;
+            margin-top: 20px;
         }
         .game-button:hover {
-            background-color: #555;
+            background-color: #333;
+        }
+        .game-input {
+            background-color: #1a1a1a;
+            color: #00ff00;
+            padding: 10px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 5px;
         }
         .score-board {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 24px;
+            margin-top: 30px;
+            font-size: 1.2rem;
+            color: #fff;
         }
-        #gameCanvas {
-            border: 2px solid #fff;
-            background-color: #333;
+        .score-board p {
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>بازی تحت وب</h1>
-        <div class="score-board" id="scoreBoard">امتیاز: 0</div>
-        <button class="game-button" onclick="startGame()">شروع بازی</button>
-        <canvas id="gameCanvas" width="600" height="400"></canvas>
+
+    <div class="container">
+        <h1>Welcome to Hacker Challenge</h1>
+        <div id="game-section">
+            <button class="game-button" onclick="startGame()">Start Game</button>
+        </div>
+        <div class="score-board" id="score-board"></div>
     </div>
 
     <script>
-        let canvas = document.getElementById("gameCanvas");
-        let ctx = canvas.getContext("2d");
-        let score = 0;
-        let gameInterval;
-        let isGameRunning = false;
-        let ballX = canvas.width / 2;
-        let ballY = canvas.height - 30;
-        let ballRadius = 10;
-        let dx = 2;
-        let dy = -2;
+        // Store score in LocalStorage
+        let score = localStorage.getItem('score') ? parseInt(localStorage.getItem('score')) : 0;
 
+        // Function to start the game
         function startGame() {
-            if (isGameRunning) return;
-
-            isGameRunning = true;
-            score = 0;
-            document.getElementById("scoreBoard").innerText = "امتیاز: " + score;
-            gameInterval = setInterval(gameLoop, 16);
+            document.getElementById('game-section').innerHTML = `
+                <h2>Decrypt the Code</h2>
+                <p>Enter the correct decryption key to win</p>
+                <input class="game-input" type="text" id="user-input" placeholder="Enter code here..." autofocus>
+                <button class="game-button" onclick="checkCode()">Submit</button>
+            `;
         }
 
-        function gameLoop() {
-            clearCanvas();
-            drawBall();
-            moveBall();
-            checkCollision();
+        // Function to check the entered code
+        function checkCode() {
+            const userInput = document.getElementById('user-input').value;
+            const correctCode = "H4ck3r"; // This is the "correct" code for the decryption challenge
+
+            if (userInput === correctCode) {
+                score += 10; // Increase score if code is correct
+                alert('Success! You decrypted the code.');
+            } else {
+                score -= 5; // Decrease score if code is incorrect
+                alert('Wrong code. Try again!');
+            }
+
+            // Save score to LocalStorage
+            localStorage.setItem('score', score);
             updateScore();
         }
 
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        function drawBall() {
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-            ctx.fillStyle = "#fff";
-            ctx.fill();
-            ctx.closePath();
-        }
-
-        function moveBall() {
-            ballX += dx;
-            ballY += dy;
-        }
-
-        function checkCollision() {
-            if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
-                dx = -dx;
-            }
-            if (ballY + dy < ballRadius) {
-                dy = -dy;
-            } else if (ballY + dy > canvas.height - ballRadius) {
-                clearInterval(gameInterval);
-                alert("بازی تمام شد! امتیاز شما: " + score);
-                isGameRunning = false;
-            }
-        }
-
+        // Function to update and display score
         function updateScore() {
-            score++;
-            document.getElementById("scoreBoard").innerText = "امتیاز: " + score;
+            const scoreBoard = document.getElementById('score-board');
+            scoreBoard.innerHTML = `
+                <p>Your Score: ${score}</p>
+                <p><strong>Game Modes:</strong></p>
+                <p>1. Code Decryption</p>
+                <p>2. Firewall Breach</p>
+                <p>3. Password Cracking</p>
+            `;
         }
+
+        // Initialize score board
+        updateScore();
     </script>
 </body>
 </html>
