@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی تحت وب</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            text-align: center;
+        }
+        .game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .game-button {
+            margin: 10px;
+            padding: 20px;
+            font-size: 20px;
+            background-color: #333;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .game-button:hover {
+            background-color: #555;
+        }
+        .score-board {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+        }
+        #gameCanvas {
+            border: 2px solid #fff;
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>بازی تحت وب</h1>
+        <div class="score-board" id="scoreBoard">امتیاز: 0</div>
+        <button class="game-button" onclick="startGame()">شروع بازی</button>
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+    </div>
+
+    <script>
+        let canvas = document.getElementById("gameCanvas");
+        let ctx = canvas.getContext("2d");
+        let score = 0;
+        let gameInterval;
+        let isGameRunning = false;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height - 30;
+        let ballRadius = 10;
+        let dx = 2;
+        let dy = -2;
+
+        function startGame() {
+            if (isGameRunning) return;
+
+            isGameRunning = true;
+            score = 0;
+            document.getElementById("scoreBoard").innerText = "امتیاز: " + score;
+            gameInterval = setInterval(gameLoop, 16);
+        }
+
+        function gameLoop() {
+            clearCanvas();
+            drawBall();
+            moveBall();
+            checkCollision();
+            updateScore();
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function moveBall() {
+            ballX += dx;
+            ballY += dy;
+        }
+
+        function checkCollision() {
+            if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) {
+                dx = -dx;
+            }
+            if (ballY + dy < ballRadius) {
+                dy = -dy;
+            } else if (ballY + dy > canvas.height - ballRadius) {
+                clearInterval(gameInterval);
+                alert("بازی تمام شد! امتیاز شما: " + score);
+                isGameRunning = false;
+            }
+        }
+
+        function updateScore() {
+            score++;
+            document.getElementById("scoreBoard").innerText = "امتیاز: " + score;
+        }
+    </script>
+</body>
+</html>
