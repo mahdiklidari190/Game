@@ -1,112 +1,196 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Game</title>
+    <title>سایت بازی‌های هکری</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #0c0c0c;
-            color: #00ff00;
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
-        .container {
-            padding: 50px;
-        }
+
         h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
+            font-size: 3em;
+            color: #00ff00; /* سبز نئونی */
         }
+
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            width: 80%;
+            margin: 20px 0;
+        }
+
         .game-button {
-            background-color: #1a1a1a;
-            color: #00ff00;
-            padding: 15px;
-            font-size: 1.5rem;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-        .game-button:hover {
             background-color: #333;
-        }
-        .game-input {
-            background-color: #1a1a1a;
+            border: 2px solid #00ff00;
+            padding: 20px;
             color: #00ff00;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            width: 150px;
+        }
+
+        .game-button:hover {
+            background-color: #00ff00;
+            color: #333;
+        }
+
+        .score {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5em;
+            background-color: #00ff00;
             padding: 10px;
-            font-size: 1.5rem;
-            border: none;
             border-radius: 5px;
         }
-        .score-board {
+
+        .game {
+            display: none;
+            text-align: center;
+            width: 100%;
             margin-top: 30px;
-            font-size: 1.2rem;
+        }
+
+        .game h2 {
             color: #fff;
         }
-        .score-board p {
-            margin: 5px 0;
+
+        .game button {
+            background-color: #00ff00;
+            color: #333;
+            padding: 15px;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
         }
+
+        .game button:hover {
+            background-color: #fff;
+            color: #00ff00;
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Welcome to Hacker Challenge</h1>
-        <div id="game-section">
-            <button class="game-button" onclick="startGame()">Start Game</button>
-        </div>
-        <div class="score-board" id="score-board"></div>
-    </div>
+<h1>سایت بازی‌های هکری</h1>
 
-    <script>
-        // Store score in LocalStorage
-        let score = localStorage.getItem('score') ? parseInt(localStorage.getItem('score')) : 0;
+<div class="score">امتیاز: <span id="score">0</span></div>
 
-        // Function to start the game
-        function startGame() {
-            document.getElementById('game-section').innerHTML = `
-                <h2>Decrypt the Code</h2>
-                <p>Enter the correct decryption key to win</p>
-                <input class="game-input" type="text" id="user-input" placeholder="Enter code here..." autofocus>
-                <button class="game-button" onclick="checkCode()">Submit</button>
-            `;
-        }
+<div class="game-container">
+    <button class="game-button" onclick="startGame('guessNumber')">بازی حدس عدد</button>
+    <button class="game-button" onclick="startGame('clickSpeed')">تست سرعت کلیک</button>
+    <button class="game-button" onclick="startGame('countBalls')">بازی شمارش توپ‌ها</button>
+</div>
 
-        // Function to check the entered code
-        function checkCode() {
-            const userInput = document.getElementById('user-input').value;
-            const correctCode = "H4ck3r"; // This is the "correct" code for the decryption challenge
+<!-- بازی حدس عدد -->
+<div id="guessNumber" class="game">
+    <h2>بازی حدس عدد</h2>
+    <p>یک عدد بین 1 و 100 حدس بزنید:</p>
+    <input type="number" id="guessInput" />
+    <button onclick="checkGuess()">حدس زدن</button>
+    <p id="guessResult"></p>
+</div>
 
-            if (userInput === correctCode) {
-                score += 10; // Increase score if code is correct
-                alert('Success! You decrypted the code.');
-            } else {
-                score -= 5; // Decrease score if code is incorrect
-                alert('Wrong code. Try again!');
-            }
+<!-- بازی تست سرعت کلیک -->
+<div id="clickSpeed" class="game">
+    <h2>تست سرعت کلیک</h2>
+    <button onclick="startClickSpeedTest()">شروع تست</button>
+    <p id="clickSpeedResult"></p>
+</div>
 
-            // Save score to LocalStorage
-            localStorage.setItem('score', score);
-            updateScore();
-        }
+<!-- بازی شمارش توپ‌ها -->
+<div id="countBalls" class="game">
+    <h2>بازی شمارش توپ‌ها</h2>
+    <p>چند توپ در تصویر وجود دارد؟</p>
+    <img src="https://via.placeholder.com/150x150.png?text=⚽️" id="ballImage" />
+    <input type="number" id="ballCountInput" />
+    <button onclick="checkBallCount()">حدس زدن</button>
+    <p id="ballCountResult"></p>
+</div>
 
-        // Function to update and display score
-        function updateScore() {
-            const scoreBoard = document.getElementById('score-board');
-            scoreBoard.innerHTML = `
-                <p>Your Score: ${score}</p>
-                <p><strong>Game Modes:</strong></p>
-                <p>1. Code Decryption</p>
-                <p>2. Firewall Breach</p>
-                <p>3. Password Cracking</p>
-            `;
-        }
+<script>
+// ذخیره امتیاز در LocalStorage
+let score = localStorage.getItem('score') ? parseInt(localStorage.getItem('score')) : 0;
+document.getElementById('score').textContent = score;
 
-        // Initialize score board
-        updateScore();
-    </script>
+// نمایش بازی انتخابی
+function startGame(game) {
+    // پنهان کردن همه بازی‌ها
+    const games = document.querySelectorAll('.game');
+    games.forEach((game) => game.style.display = 'none');
+
+    // نمایش بازی انتخابی
+    document.getElementById(game).style.display = 'block';
+}
+
+// بازی حدس عدد
+function checkGuess() {
+    const randomNumber = Math.floor(Math.random() * 100) + 1;
+    const userGuess = parseInt(document.getElementById('guessInput').value);
+    const result = document.getElementById('guessResult');
+
+    if (userGuess === randomNumber) {
+        result.textContent = "آفرین! عدد درست بود!";
+        score++;
+        localStorage.setItem('score', score);
+        document.getElementById('score').textContent = score;
+    } else {
+        result.textContent = `عدد درست ${randomNumber} بود. دوباره امتحان کن!`;
+    }
+}
+
+// بازی تست سرعت کلیک
+let clickStartTime;
+let clickCount = 0;
+function startClickSpeedTest() {
+    clickStartTime = new Date().getTime();
+    clickCount = 0;
+    document.getElementById('clickSpeedResult').textContent = "زودتر کلیک کن!";
+    setTimeout(endClickSpeedTest, 5000);
+}
+function endClickSpeedTest() {
+    const clickEndTime = new Date().getTime();
+    const timeTaken = (clickEndTime - clickStartTime) / 1000; // زمان به ثانیه
+    document.getElementById('clickSpeedResult').textContent = `تست تمام شد! زمان شما: ${timeTaken} ثانیه. کلیک‌ها: ${clickCount}`;
+    score++;
+    localStorage.setItem('score', score);
+    document.getElementById('score').textContent = score;
+}
+document.getElementById('clickSpeed').addEventListener('click', () => {
+    clickCount++;
+});
+
+// بازی شمارش توپ‌ها
+function checkBallCount() {
+    const correctCount = 1; // تعداد توپ‌ها
+    const userGuess = parseInt(document.getElementById('ballCountInput').value);
+    const result = document.getElementById('ballCountResult');
+
+    if (userGuess === correctCount) {
+        result.textContent = "آفرین! تعداد توپ‌ها درست بود!";
+        score++;
+        localStorage.setItem('score', score);
+        document.getElementById('score').textContent = score;
+    } else {
+        result.textContent = `تعداد توپ‌ها درست نبود! تعداد صحیح: ${correctCount}`;
+    }
+}
+</script>
+
 </body>
 </html>
